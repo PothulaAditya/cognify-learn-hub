@@ -34,37 +34,66 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesProcessed }) => {
 
     setUploadedFiles((prev) => [...prev, ...newFiles]);
 
-    // Simulate upload progress
-    newFiles.forEach((file) => {
-      simulateUpload(file.id);
+    // Upload files to webhook
+    newFiles.forEach((fileRecord, index) => {
+      uploadToWebhook(acceptedFiles[index], fileRecord.id);
     });
 
     toast({
       title: "Upload started",
-      description: `Uploading ${acceptedFiles.length} file(s)`,
+      description: `Uploading ${acceptedFiles.length} file(s) to agent`,
     });
   }, []);
 
-  const simulateUpload = (fileId: string) => {
-    const interval = setInterval(() => {
+  const uploadToWebhook = async (file: File, fileId: string) => {
+    const webhookUrl = "http://localhost:5678/webhook-test/df79ac89-b5c8-4872-b84c-083d0d3a3c97";
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('fileName', file.name);
+      formData.append('fileSize', file.size.toString());
+      formData.append('uploadDate', new Date().toISOString());
+      formData.append('app', 'Cognify');
+
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        body: formData,
+        mode: "no-cors"
+      });
+
+      // Update file status to completed
       setUploadedFiles((prev) =>
-        prev.map((file) => {
-          if (file.id === fileId && file.status === "uploading") {
-            const newProgress = file.progress + Math.random() * 20;
-            if (newProgress >= 100) {
-              clearInterval(interval);
-              toast({
-                title: "Upload completed",
-                description: `${file.name} uploaded successfully`,
-              });
-              return { ...file, progress: 100, status: "completed" as const };
-            }
-            return { ...file, progress: newProgress };
-          }
-          return file;
-        })
+        prev.map((f) => 
+          f.id === fileId 
+            ? { ...f, progress: 100, status: "completed" as const }
+            : f
+        )
       );
-    }, 200);
+
+      toast({
+        title: "Upload completed",
+        description: `${file.name} sent to agent successfully`,
+      });
+
+    } catch (error) {
+      console.error("Error uploading to webhook:", error);
+      
+      // Update file status to error
+      setUploadedFiles((prev) =>
+        prev.map((f) => 
+          f.id === fileId 
+            ? { ...f, status: "error" as const }
+            : f
+        )
+      );
+
+      toast({
+        title: "Upload failed",
+        description: `Failed to send ${file.name} to agent`,
+        variant: "destructive",
+      });
+    }
   };
 
   const removeFile = (fileId: string) => {
@@ -152,6 +181,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesProcessed }) => {
                       {file.status === "completed" && (
                         <div className="p-1 rounded-full bg-success/10">
                           <Check className="h-4 w-4 text-success" />
+                        </div>
+                      )}
+                      {file.status === "error" && (
+                        <div className="p-1 rounded-full bg-destructive/10">
+                          <X className="h-4 w-4 text-destructive" />
                         </div>
                       )}
                       <Button
