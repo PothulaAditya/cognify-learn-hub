@@ -59,8 +59,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesProcessed }) => {
       const response = await fetch(webhookUrl, {
         method: "POST",
         body: formData,
-        mode: "no-cors"
+        headers: {
+          'Accept': 'application/json',
+        }
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       // Update file status to completed
       setUploadedFiles((prev) =>
@@ -89,8 +95,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesProcessed }) => {
       );
 
       toast({
-        title: "Upload failed",
-        description: `Failed to send ${file.name} to agent`,
+        title: "CORS Error - Upload Failed",
+        description: `Cannot upload from HTTPS to localhost. Your webhook needs CORS headers or use a proxy.`,
         variant: "destructive",
       });
     }
