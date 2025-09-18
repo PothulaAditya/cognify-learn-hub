@@ -46,7 +46,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesProcessed }) => {
   }, []);
 
   const uploadToWebhook = async (file: File, fileId: string) => {
-    const webhookUrl = "http://localhost:5678/webhook-test/df79ac89-b5c8-4872-b84c-083d0d3a3c97";
+    const webhookUrl = "https://your-ngrok-url.ngrok.io/webhook-test/df79ac89-b5c8-4872-b84c-083d0d3a3c97";
     
     try {
       const formData = new FormData();

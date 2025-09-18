@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Zap, Send, Loader2 } from "lucide-react";
 
 const WebhookIntegration = () => {
-  const [webhookUrl, setWebhookUrl] = useState("http://localhost:5678/webhook-test/df79ac89-b5c8-4872-b84c-083d0d3a3c97");
+  const [webhookUrl, setWebhookUrl] = useState("https://your-ngrok-url.ngrok.io/webhook-test/df79ac89-b5c8-4872-b84c-083d0d3a3c97");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
