@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FileUpload } from "@/components/FileUpload";
 import { ChapterViewer } from "@/components/ChapterViewer";
 import { VideoPlayer } from "@/components/VideoPlayer";
+import WebhookIntegration from "@/components/WebhookIntegration";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Sparkles, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -172,6 +173,11 @@ const Index = () => {
                 </p>
               </div>
             )}
+          </section>
+
+          {/* Webhook Integration Section */}
+          <section>
+            <WebhookIntegration />
           </section>
 
           {/* Chapter Viewer Section */}
